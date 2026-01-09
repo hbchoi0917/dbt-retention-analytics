@@ -20,5 +20,4 @@ dbt docs generate && dbt docs serve  # Lineage viz
 
 ## 📊 Lineage (dbt docs)
 
-<img width="1717" height="510" alt="image" src="https://github.com/user-attachments/assets/791b1a11-8b08-4dca-9c33-3f1db8e410c5" />
-
+<img width="844" height="242" alt="Lineage Graph" src="https://github.com/user-attachments/assets/fe6b019f-dc71-4a59-ad19-5a9a1c070af3" />
