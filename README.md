@@ -17,3 +17,8 @@ dbt deps     # dbt_utils
 dbt run      # staging→intermediate→mart
 dbt test     # data quality gates
 dbt docs generate && dbt docs serve  # Lineage viz
+
+## 📊 Lineage (dbt docs)
+
+<img width="1717" height="510" alt="image" src="https://github.com/user-attachments/assets/791b1a11-8b08-4dca-9c33-3f1db8e410c5" />
+
