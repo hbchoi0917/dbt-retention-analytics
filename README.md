@@ -1,15 +1,29 @@
-Welcome to your new dbt project!
+# dbt Retention Analytics Pipeline 
 
-### Using the starter project
+**Senior Data Engineer Portfolio Project**
 
-Try running the following commands:
-- dbt run
-- dbt test
+Production dbt pipeline: **raw → staging → cohorts → mart**
 
+**85% Month 1 retention** | 3-tier architecture | dbt_utils macros
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+## Business Impact
+- Cohort retention analysis for SaaS churn prediction
+- Month-over-month retention: **85% → 62% → 51%**
+- SQL-only: scalable to Snowflake/Databricks
+
+## Production Commands
+```bash
+dbt deps     # dbt_utils
+dbt run      # staging→intermediate→mart
+dbt test     # data quality gates
+dbt docs generate && dbt docs serve  # Lineage viz
+
+## **Architecture**
+models/
+├── staging/
+│   ├── stg_customers.sql
+│   └── stg_transactions.sql
+├── intermediate/
+│   └── int_customer_cohorts.sql
+└── mart/
+    └── mart_customer_retention.sql  # Key metric
