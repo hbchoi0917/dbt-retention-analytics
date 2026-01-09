@@ -1,6 +1,6 @@
 # dbt Retention Analytics Pipeline 
 
-**Senior Data Engineer Portfolio Project**
+**Data / Analytics Engineer Portfolio Project**
 
 Production dbt pipeline: **raw → staging → cohorts → mart**
 
@@ -16,9 +16,6 @@ Production dbt pipeline: **raw → staging → cohorts → mart**
 dbt deps     # dbt_utils
 dbt run      # staging→intermediate→mart
 dbt test     # data quality gates
-
-## 📊 dbt Lineage Graph
-![lineage_screenshot.png](https://github.com/hbchoi0917/dbt-retention-analytics/blob/master/lineage_screenshot.png)
 
 
 
