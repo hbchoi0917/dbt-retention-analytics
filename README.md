@@ -17,7 +17,8 @@ dbt deps     # dbt_utils
 dbt run      # staging→intermediate→mart
 dbt test     # data quality gates
 
-
+## 📊 dbt Lineage Graph
+![Lineage](lineage_screenshot.png)
 
 
 
