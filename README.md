@@ -17,13 +17,3 @@ dbt deps     # dbt_utils
 dbt run      # staging→intermediate→mart
 dbt test     # data quality gates
 dbt docs generate && dbt docs serve  # Lineage viz
-
-## **Architecture**
-models/
-├── staging/
-│   ├── stg_customers.sql
-│   └── stg_transactions.sql
-├── intermediate/
-│   └── int_customer_cohorts.sql
-└── mart/
-    └── mart_customer_retention.sql  # Key metric
