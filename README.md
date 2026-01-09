@@ -18,6 +18,5 @@ dbt run      # staging→intermediate→mart
 dbt test     # data quality gates
 dbt docs generate && dbt docs serve  # Lineage viz
 
-## 📊 Lineage (dbt docs)
 
-<img width="844" height="242" alt="Lineage Graph" src="https://github.com/user-attachments/assets/fe6b019f-dc71-4a59-ad19-5a9a1c070af3" />
+
