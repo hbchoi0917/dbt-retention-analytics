@@ -18,7 +18,7 @@ dbt run      # staging→intermediate→mart
 dbt test     # data quality gates
 
 ## 📊 dbt Lineage Graph
-![lineage_screenshot.png](https://raw.githubusercontent.com/hbchoi0917/dbt-retention-analytics/blob/master/lineage_screenshot.png)
+![Lineage](lineage_screenshot.png)
 
 
 
