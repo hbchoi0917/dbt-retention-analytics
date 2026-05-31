@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: >
+      One row per unique customer, deduplicated from raw_transactions using the
+      earliest transaction record per customer_id.
+    columns:
+      - name: customer_id
+        description: Unique customer identifier.
+        tests:
+          - unique
+          - not_null
+      - name: customer_gender
+        description: Customer gender as recorded at first transaction.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Male', 'Female']
+      - name: customer_age
+        description: Customer age at first transaction.
+        tests:
+          - not_null
+
+  - name: stg_transactions
+    description: >
+      Cleaned and renamed transaction records from the raw seed. One row per
+      transaction. Source columns are preserved; no business logic applied.
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier.
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to stg_customers.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: transaction_date
+        description: Date the transaction occurred.
+        tests:
+          - not_null
+      - name: product_category
+        description: Product category (Beauty, Clothing, Electronics, etc.).
+        tests:
+          - not_null
+      - name: quantity
+        description: Number of units purchased.
+        tests:
+          - not_null
+      - name: price_per_unit
+        description: Unit price at time of purchase.
+        tests:
+          - not_null
+      - name: total_amount
+        description: Total transaction value (quantity * price_per_unit).
+        tests:
+          - not_null

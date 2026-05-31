@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: int_customer_cohorts
+    description: >
+      Each transaction enriched with the customer's cohort month (month of first
+      purchase) and the month_offset (months elapsed since cohort entry).
+      Used as the single source of truth for all cohort-based retention models.
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier.
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to stg_customers.
+        tests:
+          - not_null
+      - name: transaction_date
+        description: Date the transaction occurred.
+        tests:
+          - not_null
+      - name: product_category
+        description: Product category of the transaction.
+        tests:
+          - not_null
+      - name: total_amount
+        description: Transaction revenue.
+        tests:
+          - not_null
+      - name: cohort_month
+        description: Month of the customer's first-ever purchase (date_trunc to month).
+        tests:
+          - not_null
+      - name: month_offset
+        description: >
+          Integer number of months between cohort_month and the transaction month.
+          0 = acquisition month, 1 = first full month after acquisition, etc.
+        tests:
+          - not_null
