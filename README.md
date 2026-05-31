@@ -1,74 +1,107 @@
-# dbt Retention Analytics Pipeline 
+# dbt Retention Analytics Pipeline
 
-**Data / Analytics Engineer Portfolio Project**
+**Analytics Engineering Portfolio Project**
 
-Production dbt pipeline: **raw → staging → cohorts → mart**
+Production-style dbt pipeline for cohort-based customer retention analysis.
 
-**85% Month 1 retention** | 3-tier architecture | dbt_utils macros
+**Stack:** dbt Core · DuckDB · dbt_utils
+
+---
 
 ## Dataset
-**E-commerce transactions** (synthetic, production-scale):
-- 50K customers, 250K orders
-- 12 months data (2024-2025)
-- Key fields: customer_id, order_date, revenue, status
 
-Business context: SaaS subscription churn analysis
+**E-commerce transactions** (synthetic):
+- 1,000 transactions · 1,000 unique customers
+- Date range: 2023-01 – 2024-01
+- Fields: transaction_id, customer_id, date, product_category, quantity, price_per_unit, total_amount, gender, age
 
-## dbt Architecture
+> **Note:** This seed represents a proof-of-concept dataset (1 transaction/customer).  
+> In production, swap `raw_transactions` for a source table with repeat-purchase history to observe meaningful retention curves.
+
+---
+
+## Architecture
+
 ```
-raw/ # CSV seeds
-├── customers.csv
-└── transactions.csv
+seeds/
+└── raw_transactions.csv          # Source: denormalized e-commerce transactions
 
 models/
-├── staging/ # Clean + test
-│ ├── stg_customers.sql
-│ └── stg_transactions.sql
-├── intermediate/ # Business logic
-│ └── int_cohorts.sql
-└── mart/ # Metrics
-└── mart_retention.sql # 85% M1 retention
+├── staging/                      # Rename, type-cast, deduplicate — no business logic
+│   ├── stg_customers.sql         # 1 row per customer (QUALIFY dedup)
+│   ├── stg_transactions.sql      # 1 row per transaction
+│   └── schema.yml                # Column docs + unique/not_null/relationships tests
+│
+├── intermediate/                 # Business logic: cohort assignment
+│   ├── int_customer_cohorts.sql  # Transactions enriched with cohort_month & month_offset
+│   └── schema.yml
+│
+└── mart/                         # Aggregated, BI-ready metrics (materialized: table)
+    ├── mart_customer_retention.sql
+    └── schema.yml
 ```
 
-## Production Commands
+### Lineage
+
+![DAG lineage](lineage_screenshot.png)
+
+---
+
+## Key Metrics — `mart_customer_retention`
+
+| Column | Description |
+|---|---|
+| `cohort_month` | Month of first purchase |
+| `month_offset` | Months since acquisition (0 = acquisition month) |
+| `cohort_size` | Customers acquired in that month |
+| `active_customers` | Customers still transacting at this offset |
+| `retention_rate_pct` | `active / cohort_size * 100` |
+| `churn_rate_pct` | `(1 - active / cohort_size) * 100` |
+
+---
+
+## Design Decisions
+
+| Decision | Rationale |
+|---|---|
+| Monthly cohorts (`date_trunc`) | Daily cohorts produce cohort sizes of 1–2, making rates meaningless |
+| `QUALIFY ROW_NUMBER()` in `stg_customers` | Deterministic dedup when customer attributes vary across transactions |
+| `product_category` propagated to intermediate | Enables downstream category-level retention slices |
+| Mart materialized as `table` | Retention queries scan the full dataset; pre-aggregation reduces BI tool latency |
+
+---
+
+## Data Quality Tests
+
+Defined in `schema.yml` at every layer:
+
+- **Staging:** `unique`, `not_null` on all PKs; `relationships` from `stg_transactions.customer_id` → `stg_customers`; `accepted_values` on `customer_gender`
+- **Intermediate:** `unique` + `not_null` on all columns
+- **Mart:** `not_null` on all output columns
+
+---
+
+## Getting Started
+
+```bash
+# Install packages
+dbt deps
+
+# Run all models
+dbt run
+
+# Run data quality tests
+dbt test
+
+# Run + test together
+dbt build
 ```
-dbt deps     # dbt_utils
-dbt run      # staging → intermediate → mart
-dbt test     # data quality gates
-```
 
-## Key Metrics
-| Cohort | M1 | M2 | M3 |
-|--------|----|----|----|
-| 2024-01 | 85% | 62% | 51% |
-| 2024-02 | 82% | 59% | 48% |
+---
 
-**Primary KPI:** Month 1 retention (industry benchmark: 70-80%)
+## Next Steps
 
-## Business Impact
-- Cohort retention analysis for SaaS churn prediction
-- Month-over-month retention: **85% → 62% → 51%**
-- SQL-only: scalable to Snowflake/Databricks
-
-## Strategy Recommendations
-**Current:** Strong M1 retention (85%) → acquisition efficient
-**Risk:** M3 drop to 51% → churn acceleration
-
-### Immediate Actions:
-1. **Win-back campaign** → M2/M3 cohorts ($47K revenue potential)
-2. **Feature adoption tracking** → correlate usage → retention
-3. **Price sensitivity analysis** → premium tier test
-
-### Engineering Next:
-- LTV model (dbt + Python scoring)
-- A/B test framework (experiment table)
-- Snowflake migration ($$-optimized)
-
-## Next Projects to Consider
-1. **LTV Pipeline** → CLTV prediction 
-2. **Experiment Platform** → A/B test results mart
-
-dbt run      # staging → intermediate → mart
-dbt test     # data quality gates
-
-
+1. **LTV model** — cumulative revenue per cohort → CLTV prediction
+2. **Category-level retention** — slice `mart_customer_retention` by `product_category`
+3. **Experiment mart** — A/B test results table for retention intervention analysis
+4. **Cloud migration** — Snowflake/BigQuery source swap (only `profiles.yml` change required)

@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: mart_customer_retention
+    description: >
+      Monthly cohort retention table. Each row represents one cohort-month
+      combination, showing how many customers from the original cohort were
+      still active (made a purchase) in that month offset.
+
+      Retention rate = active_customers / cohort_size * 100.
+      Churn rate     = (1 - active_customers / cohort_size) * 100.
+
+      month_offset = 0 is always 100% retention (the acquisition month itself).
+    columns:
+      - name: cohort_month
+        description: The month a cohort of customers made their first purchase.
+        tests:
+          - not_null
+      - name: month_offset
+        description: Months since cohort acquisition (0 = acquisition month).
+        tests:
+          - not_null
+      - name: cohort_size
+        description: Total number of distinct customers in this cohort.
+        tests:
+          - not_null
+      - name: active_customers
+        description: Distinct customers from this cohort who transacted in this month offset.
+        tests:
+          - not_null
+      - name: retention_rate_pct
+        description: Percentage of cohort still active at this month offset (0–100).
+        tests:
+          - not_null
+      - name: churn_rate_pct
+        description: Percentage of cohort lost by this month offset (0–100).
+        tests:
+          - not_null
